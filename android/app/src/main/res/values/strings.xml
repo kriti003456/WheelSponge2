@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WheelSponge</string>
+    <string name="facebook_app_id">2618269361791534</string>
+    <string name="fb_login_protocol_scheme">fb2618269361791534</string>
+</resources>
