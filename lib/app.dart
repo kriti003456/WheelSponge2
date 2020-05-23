@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'login.dart';
-
+import 'package:wheelsponge/Pages/HomePage.dart';
+import 'package:wheelsponge/Pages/signinPage.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -9,8 +8,8 @@ class MyApp extends StatelessWidget {
       title: 'WheelSponge',
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => HomeScreen(),
-        '/login': (context) => LoginScreen(),
+        '/': (context) => HomePage(),
+        '/login': (context) => SignInPage(),
       },
     );
   }
