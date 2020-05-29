@@ -13,14 +13,14 @@ class SignInService {
   final GoogleSignIn googleSignIn = new GoogleSignIn();
   final facebookLogin = FacebookLogin();
   FirebaseUser firebaseUser;
-  FirebaseAuth _auth;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   Firestore _firestore = Firestore.instance;
 
   Future<FirebaseUser> signInWithGoogle() async {
     if (googleAccount == null) {
       googleAccount = await googleSignIn.signIn();
       final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleAccount.authentication;
+      await googleAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleSignInAuthentication.accessToken,
@@ -28,7 +28,7 @@ class SignInService {
       );
 
       final AuthResult authResult =
-          await _auth.signInWithCredential(credential);
+      await _auth.signInWithCredential(credential);
       firebaseUser = authResult.user;
 
       assert(!firebaseUser.isAnonymous);
@@ -37,6 +37,7 @@ class SignInService {
       final FirebaseUser currentUser = await _auth.currentUser();
       assert(firebaseUser.uid == currentUser.uid);
       print("Google signed in ${firebaseUser.displayName}");
+      _createFirestoreDocument();
     }
     return firebaseUser;
   }
@@ -58,13 +59,14 @@ class SignInService {
         final AuthCredential credential = FacebookAuthProvider.getCredential(
             accessToken: facebookAccessToken.token);
         final AuthResult authResult =
-            await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
         firebaseUser = authResult.user;
         assert(firebaseUser.displayName != null);
         assert(!firebaseUser.isAnonymous);
         assert(await firebaseUser.getIdToken() != null);
         FirebaseUser currentUser = await _auth.currentUser();
         assert(firebaseUser.uid == currentUser.uid);
+        _createFirestoreDocument();
         break;
       case FacebookLoginStatus.cancelledByUser:
         break;
@@ -85,18 +87,24 @@ class SignInService {
     _auth.signOut();
   }
 
-  checkNewUser() async {
+  Future<bool> checkNewUser() async {
     print("Checking for user");
     DocumentSnapshot snapshot =
-        await _firestore.collection('users').document(firebaseUser.uid).get();
-    if (snapshot.data.containsKey('city') == false) {
-      await _firestore
-          .collection('users')
-          .document(firebaseUser.uid)
-          .setData({'name': firebaseUser.displayName});
+    await _firestore.collection('users').document(firebaseUser.uid).get();
+    if (snapshot.data == null || snapshot.data.containsKey('city') == false) {
       return true;
     } else {
       return false;
+    }
+  }
+
+  _createFirestoreDocument() async {
+    bool _newUser = await checkNewUser();
+    if(_newUser){
+    await _firestore
+        .collection('users')
+        .document(firebaseUser.uid)
+        .setData({'name': firebaseUser.displayName});
     }
   }
 }

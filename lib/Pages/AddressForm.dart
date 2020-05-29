@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wheelsponge/Data/AppData.dart';
+import 'package:wheelsponge/Pages/HomePage.dart';
 import 'package:wheelsponge/Pages/otpAuthPage.dart';
 import 'package:wheelsponge/service_locator.dart';
 
 import '../Models/UserData.dart';
 import '../Services/signInService.dart';
-import 'HomePage.dart';
 
 class AddressForm extends StatefulWidget {
   @override
@@ -28,20 +28,15 @@ class _AddressFormState extends State<AddressForm> {
     return _buildForm();
   }
 
-//  _buildView() {
-//    if (_data.society == null) return _buildForm();
-//    return _showData();
-//  }
-
   Future<void> submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save();
       String _address = this._data.house +
-          ", " +
+          ', ' +
           this._data.society +
-          ", " +
+          ', ' +
           this._data.locality +
-          ", " +
+          ', ' +
           this._data.landmark;
       await _firestore
           .collection('users')
@@ -49,9 +44,9 @@ class _AddressFormState extends State<AddressForm> {
           .setData({
         'city': this._data.city,
         'instructions': this._data.instructions,
-        'address': _address
+        'address': _address,
+//        'phoneNumber': this._data.phoneNumber
       });
-      //TODO: test send data to database
     }
   }
 
@@ -66,7 +61,6 @@ class _AddressFormState extends State<AddressForm> {
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(title: Text('WheelSponge')),
-//          padding: EdgeInsets.all(10),
       body: new Form(
         key: this._formKey,
         child: new ListView(
@@ -107,7 +101,7 @@ class _AddressFormState extends State<AddressForm> {
                   this._data.locality = selectedArea;
                 });
               },
-              value: areaDropDown,
+              value: this.areaDropDown,
             ),
             TextFormField(
               decoration: InputDecoration(
@@ -158,37 +152,33 @@ class _AddressFormState extends State<AddressForm> {
                 this._data.instructions = value;
               },
             ),
+//            TextFormField(
+//              decoration: InputDecoration(
+//                  hintText: 'Mobile Number',
+//                  labelText: 'Phone Number'),
+//              keyboardType: TextInputType.phone,
+//              validator: (value) {
+//                if (value.isEmpty || value.length < 10) {
+//                  return 'Please enter a valid mobile number';
+//                }
+//                return null;
+//              },
+//              onSaved: (String value) {
+//                this._data.phoneNumber = value;
+//              },
+//            ),
             RaisedButton(
               child: Text(
                 'Submit',
                 style: TextStyle(color: Colors.white),
               ),
-              onPressed: () async {
-                await submit();
+              onPressed: () {
+                submit();
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => OtpAuthPage()));
+                    MaterialPageRoute(builder: (context) => HomePage()));
               },
               color: Colors.blue,
             ),
-          ],
-        ),
-      ),
-    ));
-  }
-
-  Widget _showData() {
-    return MaterialApp(
-        home: Scaffold(
-      body: new Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text("City: ${_data.city}"),
-            new Text("locality: ${_data.locality}"),
-            new Text("house: ${_data.house}"),
-            new Text("society: ${_data.society}"),
-            new Text("landmark: ${_data.landmark}"),
-            new Text("instructions: ${_data.instructions}"),
           ],
         ),
       ),

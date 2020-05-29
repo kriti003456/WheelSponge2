@@ -5,5 +5,6 @@ class UserData{
   String society;
   String landmark;
   String instructions;
+  String phoneNumber;
   int packageId;
 }

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wheelsponge/Pages/PackagesPage.dart';
 import 'package:wheelsponge/Services/signInService.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../service_locator.dart';
 import 'HomePage.dart';
 
@@ -13,14 +14,14 @@ class OtpAuthPage extends StatefulWidget {
 class _OtpAuthPageState extends State<OtpAuthPage> {
   TextEditingController _phoneNumberController = TextEditingController();
   TextEditingController _otpController = TextEditingController();
-
+  Firestore _firestore = Firestore.instance;
   FirebaseUser _firebaseUser;
   String _status;
 
   AuthCredential _phoneAuthCredential;
   String _verificationId;
   int _code;
-  var _userService = locator<SignInService>();
+  var _signInService = locator<SignInService>();
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _OtpAuthPageState extends State<OtpAuthPage> {
   }
 
   _getFirebaseUser() {
-    this._firebaseUser = _userService.firebaseUser;
+    this._firebaseUser = _signInService.firebaseUser;
     setState(() {
       _status =
           (_firebaseUser == null) ? "Not logged in\n" : "Already logged in\n";
@@ -59,7 +60,7 @@ class _OtpAuthPageState extends State<OtpAuthPage> {
     String phoneNumber = "+91 " + _phoneNumberController.text.toString().trim();
     print(phoneNumber);
 
-    void verificationCompleted(AuthCredential phoneAuthCredential) {
+    void verificationCompleted(AuthCredential phoneAuthCredential) async {
       print('verification completed');
       setState(() {
         _status +=
@@ -67,6 +68,16 @@ class _OtpAuthPageState extends State<OtpAuthPage> {
       });
       this._phoneAuthCredential = phoneAuthCredential;
       print(phoneAuthCredential);
+
+      await _firestore
+          .collection('users')
+          .document(_signInService.firebaseUser.uid)
+          .setData({
+        'phoneNumber': _firebaseUser.phoneNumber
+      });
+      Navigator.pop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => PackagesPage()));
     }
 
     void verificationFailed(AuthException error) {
@@ -75,9 +86,6 @@ class _OtpAuthPageState extends State<OtpAuthPage> {
         _status += 'verification failed\n';
       });
       print(error.message);
-      Navigator.pop(context);
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => HomePage()));
     }
 
     void codeSent(String verificationId, [int code]) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wheelsponge/Pages/PackagesPage.dart';
 import 'package:wheelsponge/StaticWidgets/Drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -7,15 +8,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  _fetchData(){
-
-  }
+  _fetchData() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: AppDrawer(),
+      appBar: AppBar(
+        title: Text("Home Page"),
+      ),
+      body: PackagesPage(),
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:wheelsponge/Services/locationService.dart';
 import 'package:wheelsponge/Services/signInService.dart';
-GetIt locator = GetIt.instance;
+
+final locator = GetIt.instance;
 void setupLocator() {
-  locator.registerSingleton(SignInService());
-  locator.registerSingleton(LocationService());
+  locator.registerSingleton<SignInService>(SignInService());
+  locator.registerSingleton<LocationService>(LocationService());
 }
